@@ -2,30 +2,122 @@
 <html lang="en">
 <head>
   <meta charset="UTF-8">
-  <title>BGMI Live Leaderboard</title>
+  <title>BGMI Live Ranking</title>
+  <script src="https://cdn.jsdelivr.net/npm/tabletop@1.6.0/tabletop.min.js"></script>
   <style>
     body {
-      font-family: 'Segoe UI', sans-serif;
-      background: #121212;
+      background: #111;
       color: #fff;
-      text-align: center;
+      font-family: 'Segoe UI', sans-serif;
+      display: flex;
+      justify-content: center;
+      padding: 30px;
+    }
+
+    .leaderboard {
+      background: #1b1b1b;
+      border-radius: 20px;
+      box-shadow: 0 0 20px #007bff80;
       padding: 20px;
+      width: 360px;
     }
-    h1 {
+
+    .leaderboard h2 {
+      text-align: center;
+      color: #4db8ff;
       margin-bottom: 20px;
-      color: #facc15;
     }
-    iframe {
-      width: 95%;
-      height: 90vh;
-      border: 2px solid #facc15;
-      border-radius: 10px;
-      box-shadow: 0 0 10px #facc15;
+
+    table {
+      width: 100%;
+      border-collapse: collapse;
     }
+
+    th, td {
+      padding: 8px 6px;
+      text-align: center;
+    }
+
+    th {
+      color: #ccc;
+      font-size: 14px;
+      border-bottom: 1px solid #333;
+    }
+
+    tr td {
+      border-bottom: 1px solid #222;
+      font-size: 14px;
+    }
+
+    .alive-icons {
+      display: flex;
+      justify-content: center;
+      gap: 2px;
+    }
+
+    .dot {
+      width: 8px;
+      height: 8px;
+      border-radius: 50%;
+      background: #ccc;
+    }
+
+    .dot.red { background: red; }
+    .dot.black { background: black; }
+    .dot.white { background: white; }
   </style>
 </head>
 <body>
-  <h1>🔥 BGMI Tournament Leaderboard 🔥</h1>
-<iframe src="https://docs.google.com/spreadsheets/d/1NowDPSNrHZlRQ3zuHWUmXxg3i7fT8L68jypr8e2kMjw/preview" width="100%" height="600"></iframe>
+
+  <div class="leaderboard">
+    <h2>LIVE RANKING</h2>
+    <table id="ranking-table">
+      <thead>
+        <tr>
+          <th>Rank</th>
+          <th>Team</th>
+          <th>PTS</th>
+          <th>Alive</th>
+          <th>Elims</th>
+        </tr>
+      </thead>
+      <tbody></tbody>
+    </table>
+  </div>
+
+  <script>
+    function drawTable(data) {
+      const tbody = document.querySelector("#ranking-table tbody");
+      tbody.innerHTML = '';
+
+      data.forEach(row => {
+        const aliveDots = row.ALIVE.split('').map(char => {
+          let color = 'white';
+          if (char === 'R') color = 'red';
+          if (char === 'B') color = 'black';
+          return `<div class="dot ${color}"></div>`;
+        }).join('');
+
+        tbody.innerHTML += `
+          <tr>
+            <td>#${row.RANK}</td>
+            <td>${row.TEAM}</td>
+            <td>${row.PTS}</td>
+            <td><div class="alive-icons">${aliveDots}</div></td>
+            <td>${row.ELIMS}</td>
+          </tr>
+        `;
+      });
+    }
+
+    window.addEventListener('DOMContentLoaded', () => {
+      Tabletop.init({
+        key: '1NowDPSNrHZlRQ3zuHWUmXxg3i7fT8L68jypr8e2kMjw',
+        callback: drawTable,
+        simpleSheet: true
+      });
+    });
+  </script>
+
 </body>
 </html>
