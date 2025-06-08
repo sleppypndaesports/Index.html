@@ -2,122 +2,87 @@
 <html lang="en">
 <head>
   <meta charset="UTF-8">
-  <title>BGMI Live Ranking</title>
-  <script src="https://cdn.jsdelivr.net/npm/tabletop@1.6.0/tabletop.min.js"></script>
+  <title>Live Ranking</title>
   <style>
     body {
-      background: #111;
-      color: #fff;
-      font-family: 'Segoe UI', sans-serif;
-      display: flex;
-      justify-content: center;
-      padding: 30px;
-    }
-
-    .leaderboard {
-      background: #1b1b1b;
-      border-radius: 20px;
-      box-shadow: 0 0 20px #007bff80;
-      padding: 20px;
-      width: 360px;
-    }
-
-    .leaderboard h2 {
+      font-family: Arial, sans-serif;
+      background: #1a1a1a;
+      color: white;
       text-align: center;
-      color: #4db8ff;
-      margin-bottom: 20px;
     }
-
     table {
-      width: 100%;
+      margin: 30px auto;
       border-collapse: collapse;
+      width: 90%;
     }
-
     th, td {
-      padding: 8px 6px;
-      text-align: center;
+      padding: 10px;
+      border: 1px solid #555;
     }
-
     th {
-      color: #ccc;
-      font-size: 14px;
-      border-bottom: 1px solid #333;
+      background: #007BFF;
+      color: white;
     }
-
-    tr td {
-      border-bottom: 1px solid #222;
-      font-size: 14px;
+    .alive-box {
+      display: inline-block;
+      width: 10px;
+      height: 10px;
+      margin: 1px;
+      border-radius: 2px;
     }
-
-    .alive-icons {
-      display: flex;
-      justify-content: center;
-      gap: 2px;
-    }
-
-    .dot {
-      width: 8px;
-      height: 8px;
-      border-radius: 50%;
-      background: #ccc;
-    }
-
-    .dot.red { background: red; }
-    .dot.black { background: black; }
-    .dot.white { background: white; }
+    .red { background: red; }
+    .white { background: white; }
+    .black { background: black; }
   </style>
 </head>
 <body>
 
-  <div class="leaderboard">
-    <h2>LIVE RANKING</h2>
-    <table id="ranking-table">
-      <thead>
-        <tr>
-          <th>Rank</th>
-          <th>Team</th>
-          <th>PTS</th>
-          <th>Alive</th>
-          <th>Elims</th>
-        </tr>
-      </thead>
-      <tbody></tbody>
-    </table>
-  </div>
+<h2>LIVE RANKING</h2>
+<table id="rankingTable">
+  <thead>
+    <tr>
+      <th>Rank</th>
+      <th>Team</th>
+      <th>PTS</th>
+      <th>ALIVE</th>
+      <th>ELIMS</th>
+    </tr>
+  </thead>
+  <tbody></tbody>
+</table>
 
-  <script>
-    function drawTable(data) {
-      const tbody = document.querySelector("#ranking-table tbody");
-      tbody.innerHTML = '';
+<script>
+  const sheetURL = 'https://docs.google.com/spreadsheets/d/e/2PACX-1vSuGoemC4dBtLdujakWKYrbRFHrPu2Rae8ZyrMRVFdnsZf82vheJlCgHM3BhdLT1dSlXZxdR628z1GC/pub?output=csv';
 
-      data.forEach(row => {
-        const aliveDots = row.ALIVE.split('').map(char => {
-          let color = 'white';
-          if (char === 'R') color = 'red';
-          if (char === 'B') color = 'black';
-          return `<div class="dot ${color}"></div>`;
+  fetch(sheetURL)
+    .then(res => res.text())
+    .then(text => {
+      const rows = text.trim().split('\n').slice(1); // skip header
+      const tableBody = document.querySelector('#rankingTable tbody');
+      tableBody.innerHTML = '';
+
+      rows.forEach(row => {
+        const [rank, team, pts, alive, elims] = row.split(',');
+
+        const aliveIcons = alive.split('').map(c => {
+          if (c === 'R') return '<span class="alive-box red"></span>';
+          if (c === 'W') return '<span class="alive-box white"></span>';
+          if (c === 'B') return '<span class="alive-box black"></span>';
+          return '';
         }).join('');
 
-        tbody.innerHTML += `
-          <tr>
-            <td>#${row.RANK}</td>
-            <td>${row.TEAM}</td>
-            <td>${row.PTS}</td>
-            <td><div class="alive-icons">${aliveDots}</div></td>
-            <td>${row.ELIMS}</td>
-          </tr>
+        const tr = document.createElement('tr');
+        tr.innerHTML = `
+          <td>${rank}</td>
+          <td>${team}</td>
+          <td>${pts}</td>
+          <td>${aliveIcons}</td>
+          <td>${elims}</td>
         `;
-      });
-    }
-
-    window.addEventListener('DOMContentLoaded', () => {
-      Tabletop.init({
-        key: '1NowDPSNrHZlRQ3zuHWUmXxg3i7fT8L68jypr8e2kMjw',
-        callback: drawTable,
-        simpleSheet: true
+        tableBody.appendChild(tr);
       });
     });
-  </script>
+</script>
 
 </body>
 </html>
