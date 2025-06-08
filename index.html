@@ -52,7 +52,7 @@
 </table>
 
 <script>
-  const sheetURL = 'https://docs.google.com/spreadsheets/d/e/2PACX-1vSuGoemC4dBtLdujakWKYrbRFHrPu2Rae8ZyrMRVFdnsZf82vheJlCgHM3BhdLT1dSlXZxdR628z1GC/pub?output=csv';
+  const sheetURL = 'https://docs.google.com/spreadsheets/d/e/2PACX-1vSuGoemC4dBtLdujakWKYrbRFHrPu2Rae8ZyrMRVFdnsZf82vheJlCgHM3BhdLT1dSlXZxdR628z1GC/pub?output=csv&cacheBust=' + new Date().getTime();
 
   fetch(sheetURL)
     .then(res => res.text())
@@ -82,6 +82,11 @@
         tableBody.appendChild(tr);
       });
     });
+</script>
+
+<!-- 🔁 Auto-refresh every 10 seconds -->
+<script>
+  setInterval(() => location.reload(), 10000); // reloads every 10s
 </script>
 
 </body>
